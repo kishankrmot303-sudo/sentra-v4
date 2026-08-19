@@ -1,0 +1,37 @@
+<!doctype html><html lang="hi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1220">
+<title>Sentra</title><style>
+*{box-sizing:border-box}body{margin:0;background:#0b1220;color:#f8fafc;font-family:system-ui,sans-serif}
+.app{max-width:560px;margin:auto;padding:22px 16px 40px}.logo{font-size:32px;font-weight:800}.sub{color:#94a3b8}
+.card{background:#121c2e;border:1px solid #26344b;border-radius:20px;padding:18px;margin:12px 0}.hero{padding:24px}
+button{border:0;border-radius:14px;padding:13px 17px;background:#fff;color:#0b1220;font-weight:700;font-size:15px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tile{min-height:105px}.icon{font-size:25px}
+textarea{width:100%;margin-top:10px;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:#fff}
+#transcript{margin-top:12px;min-height:24px}.status{margin-top:10px;font-size:13px;color:#94a3b8}.reply{white-space:pre-wrap;line-height:1.5;margin-top:14px}
+</style></head><body><div class="app">
+<div class="logo">Sentra</div><div class="sub">Think clearly. Build safely.</div>
+<section class="card hero"><h1>नमस्ते 👋</h1><p>Sentra v0.4 — Voice + AI Brain</p>
+<button id="talk">🎙️ Talk to Sentra</button><div id="status" class="status">Microphone ready</div>
+<div id="transcript"></div><div id="reply" class="reply"></div></section>
+<div class="grid"><div class="card tile">📅<br><b>Today</b><div class="sub">आज का प्लान</div></div>
+<div class="card tile">💡<br><b>Ideas</b><div class="sub">नए विचार</div></div>
+<div class="card tile">🔔<br><b>Reminders</b><div class="sub">याद रखने वाली बातें</div></div>
+<div class="card tile">🧠<br><b>Memory</b><div class="sub">Sentra की memory</div></div></div>
+<section class="card"><b>Quick Note</b><textarea id="note" rows="3" placeholder="अपना idea या काम लिखो..."></textarea>
+<button onclick="saveNote()" style="margin-top:10px">Save</button><div id="notes" class="status"></div></section>
+</div><script>
+let recognition=null,listening=false;const notes=JSON.parse(localStorage.getItem('sentra_notes')||'[]');
+const $=id=>document.getElementById(id);
+function renderNotes(){$('notes').textContent=notes.slice(-5).reverse().join('\n')}
+function saveNote(){const v=$('note').value.trim();if(!v)return;notes.push('• '+v);localStorage.setItem('sentra_notes',JSON.stringify(notes));$('note').value='';renderNotes()}
+function speak(text){if('speechSynthesis'in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='hi-IN';speechSynthesis.speak(u)}}
+async function askSentra(text){$('status').textContent='🧠 Sentra सोच रहा है...';$('reply').textContent='';
+try{const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});
+const data=await res.json();if(!res.ok)throw new Error(data.error||'AI request failed');$('reply').textContent='Sentra: '+data.reply;$('status').textContent='✅ जवाब तैयार';speak(data.reply)}
+catch(e){$('status').textContent='AI error: '+e.message}}
+$('talk').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){$('status').textContent='इस browser में voice input उपलब्ध नहीं है।';return}
+if(listening){recognition.stop();return}recognition=new SR();recognition.lang='hi-IN';recognition.interimResults=true;recognition.continuous=false;
+recognition.onstart=()=>{listening=true;$('talk').textContent='⏹️ Stop Listening';$('status').textContent='🎙️ सुन रहा हूँ... बोलिए';$('transcript').textContent=''};
+recognition.onresult=e=>{let x='';for(let i=e.resultIndex;i<e.results.length;i++)x+=e.results[i][0].transcript;$('transcript').textContent='आप: '+x;if(e.results[e.results.length-1].isFinal)askSentra(x)};
+recognition.onerror=e=>{$('status').textContent='Voice input error: '+e.error};recognition.onend=()=>{listening=false;$('talk').textContent='🎙️ Talk to Sentra'};recognition.start()};renderNotes();
+</script></body></html>
