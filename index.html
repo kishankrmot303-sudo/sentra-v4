@@ -14,11 +14,19 @@ textarea{width:100%;margin-top:10px;padding:12px;border-radius:12px;border:1px s
 .msg.ai{align-self:flex-start;background:#1e293b;color:#f8fafc;border-bottom-left-radius:4px}
 .dots span{animation:blink 1.4s infinite both}.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+.inputRow{display:flex;gap:8px;margin-top:12px}
+.inputRow input{flex:1;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:#fff;font-size:14.5px}
+.inputRow button{padding:12px 18px;white-space:nowrap}
 </style></head><body><div class="app">
 <div class="logo">Sentra</div><div class="sub">Think clearly. Build safely.</div>
 <section class="card hero"><h1>नमस्ते 👋</h1><p>Sentra v0.4 — Voice + AI Brain</p>
 <button id="talk">🎙️ Talk to Sentra</button><div id="status" class="status">Microphone ready</div>
-<div id="chatBox"></div></section>
+<div id="chatBox"></div>
+<div class="inputRow">
+  <input id="textInput" type="text" placeholder="यहाँ अपना सवाल लिखें..." />
+  <button id="sendBtn">भेजें</button>
+</div>
+</section>
 <div class="grid"><div class="card tile">📅<br><b>Today</b><div class="sub">आज का प्लान</div></div>
 <div class="card tile">💡<br><b>Ideas</b><div class="sub">नए विचार</div></div>
 <div class="card tile">🔔<br><b>Reminders</b><div class="sub">याद रखने वाली बातें</div></div>
@@ -74,6 +82,16 @@ async function askSentra(text){
     $('status').textContent='AI error: '+e.message;
   }
 }
+
+$('sendBtn').onclick=()=>{
+  const v=$('textInput').value.trim();
+  if(!v)return;
+  $('textInput').value='';
+  askSentra(v);
+};
+$('textInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){$('sendBtn').click();}
+});
 
 $('talk').onclick=()=>{
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
