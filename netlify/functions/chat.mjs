@@ -1,3 +1,4 @@
+
 export default async (req) => {
   if (req.method !== "POST") return new Response(JSON.stringify({error:"Method not allowed"}),{status:405,headers:{"Content-Type":"application/json"}});
   try {
@@ -5,7 +6,7 @@ export default async (req) => {
     if (!message || typeof message !== "string") return new Response(JSON.stringify({error:"Message is required"}),{status:400,headers:{"Content-Type":"application/json"}});
     const apiKey = Netlify.env.get("GEMINI_API_KEY");
     if (!apiKey) return new Response(JSON.stringify({error:"GEMINI_API_KEY is not configured yet."}),{status:500,headers:{"Content-Type":"application/json"}});
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
