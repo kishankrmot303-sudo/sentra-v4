@@ -245,3 +245,100 @@ ${previousConversation || "No previous conversation."}
     }, 500);
   }
 };
+# SENTRA — Public-Safe Addon (Rate Limiting + User Isolation)
+
+## 1. `chat.mjs` ke top me ye import add karo
+
+```js
+import { getStore } from "@netlify/blobs";
+```
+
+Netlify Blobs use karne ke liye package install karna padega:
+```
+npm install @netlify/blobs
+```
+
+## 2. `apiKey` check ke turant baad, ye rate-limit block add karo
+
+```js
+// ---- RATE LIMITING (per IP) ----
+const clientIp =
+  req.headers.get("x-nf-client-connection-ip") ||
+  req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+  "unknown";
+
+const store = getStore("sentra-rate-limit");
+const rlKey = `ip:${clientIp}`;
+const now = Date.now();
+
+const WINDOW_MS = 60 * 1000;      // 1 minute window
+const MAX_REQUESTS = 8;           // 8 messages/minute per IP — adjust as needed
+
+let record = await store.get(rlKey, { type: "json" });
+if (!record || now - record.windowStart > WINDOW_MS) {
+  record = { windowStart: now, count: 0 };
+}
+
+record.count += 1;
+
+if (record.count > MAX_REQUESTS) {
+  return json({
+    ok: false,
+    error: "Too many requests. Thodi der baad try karein."
+  }, 429);
+}
+await store.set(rlKey, JSON.stringify(record));
+// ---- END RATE LIMITING ----
+```
+
+## 3. Duplicate/spam message protection (optional, add same block ke paas)
+
+```js
+const dupKey = `dup:${clientIp}`;
+const lastMsg = await store.get(dupKey, { type: "text" });
+if (lastMsg === safeMessage) {
+  return json({ ok: false, error: "Same message repeat mat karo." }, 429);
+}
+await store.set(dupKey, safeMessage);
+```
+
+## 4. `userId` ko ab default nahi, real per-browser ID banana hai
+
+`index.html` ke `<script>` me, top ke storage keys ke paas ye add karo:
+
+```js
+const USERID_KEY = "sentra_user_id";
+
+function getOrCreateUserId(){
+  let id = localStorage.getItem(USERID_KEY);
+  if (!id){
+    id = "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
+    localStorage.setItem(USERID_KEY, id);
+  }
+  return id;
+}
+
+const userId = getOrCreateUserId();
+```
+
+Phir jahan bhi backend ko fetch call ho raha hai (jo tumne abhi paste nahi kiya), body me:
+```js
+body: JSON.stringify({
+  message: text,
+  history: getCurrent().messages,
+  conversationId: getCurrent().id,
+  userId: userId   // ← ab real per-browser ID jaayega, "default" nahi
+})
+```
+
+## Kyun ye kaafi hai (abhi ke liye)
+
+- **Rate limit** — koi bhi ek IP se free-tier quota khatam nahi kar sakta
+- **User isolation** — har browser ka apna ID hai, future me agar server-side memory banega to data mix nahi hoga
+- **Duplicate block** — accidental double-click ya spam-click se do baar Gemini call nahi lagegi (paisa/quota bachega)
+
+## Abhi ke liye jo NAHI kar rahe (jaan-bhujke)
+- Login/authentication — abhi zaroori nahi, IP-based rate limit kaafi hai chhote scale pe
+- CAPTCHA — jab tak abuse dikhna shuru na ho, add mat karo (extra friction)
+- Global request cap (sab users milakar kitna) — agar traffic badhta hai to add karna, abhi premature hai
+  
