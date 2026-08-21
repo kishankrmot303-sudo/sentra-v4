@@ -6,19 +6,45 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SENTRA — Universal AI Core</title>
 <style>
-:root{--bg:#070a0f;--panel:#10151d;--panel2:#151c26;--line:#27313e;--text:#f4f7fb;--muted:#8d99a8;--accent:#38c8f2;--accent2:#8b7cff;--ok:#52d69a;}
+:root{
+  --bg:#070a0f;--panel:#10151d;--panel2:#151c26;--line:#27313e;--text:#f4f7fb;
+  --muted:#8d99a8;--accent:#38c8f2;--accent2:#8b7cff;--ok:#52d69a;--danger:#ff6b6b;
+}
 *{box-sizing:border-box;}
 body{margin:0;background:radial-gradient(circle at 50% -10%,#123244 0,#070a0f 42%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;}
 button,input,textarea{font:inherit;}
 button{cursor:pointer;}
 .app{max-width:900px;margin:auto;min-height:100vh;padding:14px;}
-.top{display:flex;align-items:center;justify-content:space-between;padding:8px 2px 14px;}
-.logo{display:flex;gap:10px;align-items:center;}
+.top{display:flex;align-items:center;gap:10px;padding:8px 2px 14px;}
+.menuBtn{background:transparent;border:1px solid var(--line);border-radius:12px;width:42px;height:42px;min-width:42px;display:grid;place-items:center;color:var(--text);font-size:18px;}
+.menuBtn:active{background:var(--panel2);}
+.logo{display:flex;gap:10px;align-items:center;flex:1;}
 .shield{width:42px;height:42px;border:2px solid var(--accent);border-radius:13px;display:grid;place-items:center;color:var(--accent);font-weight:900;font-size:21px;box-shadow:0 0 24px #38c8f230;}
 .brand{font-size:22px;font-weight:900;letter-spacing:2px;}
 .sub{font-size:10px;color:var(--muted);letter-spacing:1px;}
-.status{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ok);}
+.status{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ok);white-space:nowrap;}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);}
+
+.drawerOverlay{position:fixed;inset:0;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60;}
+.drawerOverlay.open{opacity:1;pointer-events:auto;}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:290px;max-width:84vw;background:#0b0f16;border-right:1px solid var(--line);transform:translateX(-100%);transition:transform .25s ease;z-index:61;display:flex;flex-direction:column;padding:14px;}
+.drawer.open{transform:translateX(0);}
+.drawerTop{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.drawerTitle{font-size:12px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;}
+.closeBtn{background:transparent;border:0;color:var(--muted);font-size:18px;padding:4px 8px;}
+.searchInput{width:100%;background:#080c12;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px;outline:none;}
+.newChatBtn{display:flex;align-items:center;gap:8px;justify-content:center;background:#0f2a36;border:1px solid var(--accent);color:var(--accent);border-radius:12px;padding:11px;font-weight:700;font-size:13px;margin-bottom:6px;}
+.newChatBtn:active{background:#123344;}
+.historyList{flex:1;overflow:auto;margin-top:8px;display:flex;flex-direction:column;gap:3px;}
+.historyEmpty{color:var(--muted);font-size:12px;padding:12px 8px;}
+.historyGroupLabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:12px 8px 4px;}
+.historyItem{display:flex;align-items:center;gap:4px;padding:9px 10px;border-radius:11px;color:var(--muted);font-size:13px;}
+.historyItem:hover,.historyItem.active{background:var(--panel2);color:var(--text);}
+.historyLabel{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.historyActions{display:flex;gap:1px;}
+.historyIconBtn{background:transparent;border:0;color:var(--muted);font-size:12px;padding:4px 6px;border-radius:8px;}
+.historyIconBtn:hover{background:#22303e;color:var(--text);}
+
 .grid{display:grid;grid-template-columns:210px 1fr;gap:12px;}
 .side,.main{background:#0e131bde;border:1px solid var(--line);border-radius:18px;}
 .side{padding:10px;}
@@ -29,7 +55,7 @@ button{cursor:pointer;}
 .msg{max-width:88%;padding:12px 14px;border-radius:16px;line-height:1.48;white-space:pre-wrap;}
 .user{align-self:flex-end;background:#175b76;}
 .ai{align-self:flex-start;background:#1b222d;}
-.system{align-self:center;color:var(--muted);font-size:11px;background:transparent;}
+.system{align-self:center;color:var(--muted);font-size:11px;background:transparent;max-width:96%;}
 .meta{font-size:10px;color:#7f8b99;margin-top:7px;}
 .composer{border-top:1px solid var(--line);padding:11px;}
 .row{display:flex;gap:8px;}
@@ -44,12 +70,41 @@ textarea{flex:1;background:#080c12;color:var(--text);border:1px solid var(--line
 .card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:10px;}
 .card h3{margin:0 0 7px;font-size:14px;}
 .card p{margin:0;color:var(--muted);font-size:12px;line-height:1.5;}
-@media(max-width:700px){.grid{grid-template-columns:1fr;}.side{display:flex;overflow:auto;gap:5px;}.tool{min-width:max-content;width:auto;}.chat{height:58vh;}}
+.listBox{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+.listItem{display:flex;align-items:center;gap:8px;background:#0d131c;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;}
+.listItem .txt{flex:1;word-break:break-word;}
+.listItem.done .txt{text-decoration:line-through;color:var(--muted);}
+.listItem button{background:transparent;border:0;color:var(--muted);font-size:13px;}
+.listItem button:hover{color:var(--danger);}
+.fullBtn{width:100%;margin-top:8px;}
+
+@media(max-width:700px){
+  .grid{grid-template-columns:1fr;}
+  .side{display:flex;overflow:auto;gap:5px;}
+  .tool{min-width:max-content;width:auto;}
+  .chat{height:58vh;}
+  .brand{font-size:19px;}
+}
 </style>
 </head>
 <body>
+
+<div class="drawerOverlay" id="drawerOverlay"></div>
+
+<aside class="drawer" id="drawer">
+  <div class="drawerTop">
+    <span class="drawerTitle">Chats</span>
+    <button class="closeBtn" id="closeDrawerBtn">✕</button>
+  </div>
+  <input id="historySearch" class="searchInput" placeholder="🔍 Chats search karein...">
+  <button class="newChatBtn" id="newChatBtn">＋ New Chat</button>
+  <div class="historyList" id="historyList"></div>
+</aside>
+
 <div class="app">
+
 <header class="top">
+<button class="menuBtn" id="menuBtn">☰</button>
 <div class="logo">
 <div class="shield">S</div>
 <div>
@@ -59,27 +114,25 @@ textarea{flex:1;background:#080c12;color:var(--text);border:1px solid var(--line
 </div>
 <div class="status"><span class="dot"></span>CORE READY</div>
 </header>
+
 <div class="grid">
+
 <aside class="side">
 <button class="tool active" data-panel="chat">🧠 AI Brain</button>
+<button class="tool" data-panel="dashboard">🏠 Dashboard</button>
 <button class="tool" data-panel="research">🔎 Research</button>
 <button class="tool" data-panel="coding">💻 Coding</button>
 <button class="tool" data-panel="study">📚 Study</button>
-<button class="tool" data-panel="memory">🧠 Memory</button>
 <button class="tool" data-panel="docs">📄 Documents</button>
 <button class="tool" data-panel="creative">🎨 Creative</button>
 <button class="tool" data-panel="assistant">📱 Assistant</button>
 <button class="tool" data-panel="security">🛡️ Security</button>
 </aside>
+
 <main class="main">
+
 <section id="chat" class="panel show">
-<div id="chatBox" class="chat">
-<div class="msg ai">Namaste! Main SENTRA hoon.
-
-Reasoning • Memory • Tools • Agents • Voice • Multimodal • Safety
-
-Aap jo kaam denge, main uske liye appropriate mode/agent choose karne ki koshish karunga.</div>
-</div>
+<div id="chatBox" class="chat"></div>
 <div class="composer">
 <div class="row">
 <button id="mic" class="btn mic">🎙️</button>
@@ -94,175 +147,670 @@ Aap jo kaam denge, main uske liye appropriate mode/agent choose karne ki koshish
 </div>
 </div>
 </section>
+
+<section id="dashboard" class="panel">
+<div class="card">
+<h3>📝 Quick Note</h3>
+<p>Bina chat kiye turant ek idea ya kaam save karo.</p>
+<textarea id="noteInput" style="width:100%;margin-top:8px;min-height:60px;background:#080c12;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px;" placeholder="Apna idea ya kaam likho..."></textarea>
+<button id="saveNoteBtn" class="btn fullBtn">Save Note</button>
+<div id="notesList" class="listBox"></div>
+</div>
+
+<div class="card">
+<h3>⏰ Reminders</h3>
+<p>Simple local reminders — yaad rakhne wali baatein (notification nahi bhejta, sirf list hai).</p>
+<div class="row" style="margin-top:8px;">
+<input id="reminderInput" style="flex:1;background:#080c12;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 12px;" placeholder="Naya reminder likho...">
+<button id="addReminderBtn" class="btn">Add</button>
+</div>
+<div id="remindersList" class="listBox"></div>
+</div>
+</section>
+
 <section id="research" class="panel">
 <div class="card"><h3>🔎 Research Agent</h3><p>Live web search, multiple-source comparison, citations, latest data, deep research aur conflict detection backend/tool integration ke through.</p></div>
 <div class="card"><h3>Source honesty</h3><p>Jab search provider connected nahi hoga, Sentra source hone ka jhootha claim nahi karega.</p></div>
 </section>
+
 <section id="coding" class="panel">
 <div class="card"><h3>💻 Coding Agent</h3><p>Code generation, explanation, debugging, project context, tests aur app/website development ke liye dedicated agent route.</p></div>
 <div class="card"><h3>Project-aware workflow</h3><p>GitHub/files integration backend tools ke through connect ki ja sakti hai. API keys browser mein nahi rakhi jaani chahiye.</p></div>
 </section>
+
 <section id="study" class="panel">
 <div class="card"><h3>📚 Study Super Brain</h3><p>Teacher mode, doubt solving, JEE/NEET preparation, personalized planning, quizzes, mock tests, mistakes, revision aur flashcards ke liye study agent.</p></div>
 </section>
-<section id="memory" class="panel">
-<div class="card"><h3>🧠 User-controlled Memory</h3><p>Preferences, projects, goals, notes aur conversation summaries ko permission ke saath store karne ka interface.</p></div>
-<button id="clearMemory" class="btn">Delete local memory</button>
-</section>
+
 <section id="docs" class="panel">
 <div class="card"><h3>📄 Document Intelligence</h3><p>PDF, image, Word, spreadsheet, extraction, summarization aur document comparison ke liye multimodal attachment contract.</p></div>
 <input id="files" type="file" multiple class="btn">
 </section>
+
 <section id="creative" class="panel">
 <div class="card"><h3>🎨 Creative Studio</h3><p>Image generation/editing, poster, logo, presentation, social content, storyboarding aur prompt generation ko tool connectors ke through invoke kiya ja sakta hai.</p></div>
 </section>
+
 <section id="assistant" class="panel">
 <div class="card"><h3>📱 Personal Assistant</h3><p>Reminders, calendar, tasks, notes, planning aur notifications ke liye permission-based external integrations.</p></div>
-<div class="card"><h3>Important actions</h3><p>Send, publish, delete, purchase, booking ya external action se pehle confirmation gate use hona chahiye.</p></div>
+<div class="card"><h3>Important actions</h3><p>Send, publish, delete, purchase, booking ya external action se pehle confirmation gate use hota hai — chat mein "delete/send/pay" jaise words par automatic confirm-popup aata hai.</p></div>
 </section>
+
 <section id="security" class="panel">
 <div class="card"><h3>🛡️ SENTRA CORE</h3><p>API keys frontend mein nahi. Sensitive data encryption, permissions, memory controls, delete-all-data, privacy dashboard aur confirmation-first design.</p></div>
 <div class="card"><h3>Never act without permission</h3><p>External actions ke liye user confirmation required rakho. Browser UI sirf request bheje. Secrets backend environment variables mein rahen.</p></div>
+<button id="clearMemory" class="btn fullBtn">Delete all local chats, notes & reminders</button>
 </section>
+
 </main>
 </div>
 </div>
+
 <script>
 const $ = id => document.getElementById(id);
 const chatBox = $("chatBox");
 const input = $("input");
 const send = $("send");
 const mic = $("mic");
-let history = JSON.parse(localStorage.getItem("sentra_history") || "[]");
+const drawer = $("drawer");
+const drawerOverlay = $("drawerOverlay");
+const historyList = $("historyList");
 
-function addMessage(text,type="ai",meta=""){
-const el = document.createElement("div");
-el.className = "msg " + type;
-el.textContent = text;
-if(meta){
-const m = document.createElement("div");
-m.className = "meta";
-m.textContent = meta;
-el.appendChild(m);
-}
-chatBox.appendChild(el);
-chatBox.scrollTop = chatBox.scrollHeight;
+const WELCOME_TEXT = "Namaste! Main SENTRA hoon.\n\nReasoning • Memory • Tools • Agents • Voice • Multimodal • Safety\n\nAap jo kaam denge, main uske liye appropriate mode/agent choose karne ki koshish karunga.";
+
+const CONVOS_KEY = "sentra_conversations";
+const LEGACY_KEY = "sentra_history";
+const NOTES_KEY = "sentra_notes";
+const REMINDERS_KEY = "sentra_reminders";
+
+// Same pattern used server-side in chat.mjs — kept in sync so the frontend
+// confirmation gate matches what the backend flags as needsConfirmation.
+const CONFIRM_REGEX = /delete|remove|erase|send|publish|post|submit|pay|purchase|buy|transfer|book/i;
+
+function makeId(){
+  return "id_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
 }
 
-function saveHistory(){
-localStorage.setItem("sentra_history", JSON.stringify(history.slice(-100)));
+/* ==========================================
+   MULTI-CHAT STORAGE
+   ========================================== */
+
+function newConversation(){
+  return { id: makeId(), title: "New chat", pinned: false, messages: [], updatedAt: Date.now() };
 }
+
+function titleFromMessages(msgs){
+  const firstUser = msgs.find(m => m.role === "user");
+  const t = (firstUser?.content || "").trim().slice(0, 40);
+  return t || "New chat";
+}
+
+function loadConversations(){
+  let convos = JSON.parse(localStorage.getItem(CONVOS_KEY) || "null");
+
+  if (!convos){
+    convos = [];
+    const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY) || "null");
+    if (legacy && legacy.length){
+      convos.push({
+        id: makeId(),
+        title: titleFromMessages(legacy),
+        pinned: false,
+        messages: legacy,
+        updatedAt: Date.now()
+      });
+    }
+  }
+
+  convos.forEach(c => { if (typeof c.pinned !== "boolean") c.pinned = false; });
+
+  if (!convos.length){
+    convos.push(newConversation());
+  }
+
+  return convos;
+}
+
+let conversations = loadConversations();
+let currentId = [...conversations].sort((a, b) => b.updatedAt - a.updatedAt)[0].id;
+let searchQuery = "";
+
+function getCurrent(){
+  return conversations.find(c => c.id === currentId);
+}
+
+function saveConversations(){
+  conversations = conversations.slice(-80);
+  localStorage.setItem(CONVOS_KEY, JSON.stringify(conversations));
+}
+
+/* ==========================================
+   CHAT UI
+   ========================================== */
+
+function addMessage(text, type = "ai", meta = ""){
+  const el = document.createElement("div");
+  el.className = "msg " + type;
+  el.textContent = text;
+  if (meta){
+    const m = document.createElement("div");
+    m.className = "meta";
+    m.textContent = meta;
+    el.appendChild(m);
+  }
+  chatBox.appendChild(el);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return el;
+}
+
+function renderChatFromCurrent(){
+  chatBox.innerHTML = "";
+  addMessage(WELCOME_TEXT, "ai");
+  getCurrent().messages.forEach(m => {
+    addMessage(m.content, m.role === "assistant" ? "ai" : "user");
+  });
+}
+
+/* ==========================================
+   HISTORY DRAWER — search, grouping, pin, rename
+   ========================================== */
+
+function conversationMatches(c, q){
+  if (!q) return true;
+  if ((c.title || "").toLowerCase().includes(q)) return true;
+  return c.messages.some(m => (m.content || "").toLowerCase().includes(q));
+}
+
+function groupLabel(ts){
+  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const today = startOfDay(new Date());
+  const day = startOfDay(new Date(ts));
+  const diffDays = Math.round((today - day) / 86400000);
+  if (diffDays <= 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays <= 7) return "Previous 7 Days";
+  return "Older";
+}
+
+function appendGroupHeader(text){
+  const h = document.createElement("div");
+  h.className = "historyGroupLabel";
+  h.textContent = text;
+  historyList.appendChild(h);
+}
+
+function appendHistoryItem(c){
+  const item = document.createElement("div");
+  item.className = "historyItem" + (c.id === currentId ? " active" : "");
+
+  const label = document.createElement("span");
+  label.className = "historyLabel";
+  label.textContent = c.title || "New chat";
+  label.onclick = () => switchConversation(c.id);
+
+  const actions = document.createElement("div");
+  actions.className = "historyActions";
+
+  const pinBtn = document.createElement("button");
+  pinBtn.className = "historyIconBtn";
+  pinBtn.textContent = c.pinned ? "📍" : "📌";
+  pinBtn.onclick = (e) => { e.stopPropagation(); togglePin(c.id); };
+
+  const renameBtn = document.createElement("button");
+  renameBtn.className = "historyIconBtn";
+  renameBtn.textContent = "✏️";
+  renameBtn.onclick = (e) => { e.stopPropagation(); renameConversation(c.id); };
+
+  const del = document.createElement("button");
+  del.className = "historyIconBtn";
+  del.textContent = "✕";
+  del.onclick = (e) => { e.stopPropagation(); deleteConversation(c.id); };
+
+  actions.appendChild(pinBtn);
+  actions.appendChild(renameBtn);
+  actions.appendChild(del);
+
+  item.appendChild(label);
+  item.appendChild(actions);
+  historyList.appendChild(item);
+}
+
+function renderHistoryList(){
+  historyList.innerHTML = "";
+  const visible = conversations.filter(c => conversationMatches(c, searchQuery));
+
+  if (!visible.length){
+    const empty = document.createElement("div");
+    empty.className = "historyEmpty";
+    empty.textContent = searchQuery ? "Koi chat nahi mili." : "Koi purani chat nahi hai.";
+    historyList.appendChild(empty);
+    return;
+  }
+
+  const pinned = visible.filter(c => c.pinned).sort((a, b) => b.updatedAt - a.updatedAt);
+  const unpinned = visible.filter(c => !c.pinned).sort((a, b) => b.updatedAt - a.updatedAt);
+
+  if (pinned.length){
+    appendGroupHeader("📌 Pinned");
+    pinned.forEach(appendHistoryItem);
+  }
+
+  let lastLabel = null;
+  unpinned.forEach(c => {
+    const label = groupLabel(c.updatedAt);
+    if (label !== lastLabel){
+      appendGroupHeader(label);
+      lastLabel = label;
+    }
+    appendHistoryItem(c);
+  });
+}
+
+$("historySearch").oninput = e => {
+  searchQuery = e.target.value.trim().toLowerCase();
+  renderHistoryList();
+};
+
+function togglePin(id){
+  const c = conversations.find(x => x.id === id);
+  if (!c) return;
+  c.pinned = !c.pinned;
+  saveConversations();
+  renderHistoryList();
+}
+
+function renameConversation(id){
+  const c = conversations.find(x => x.id === id);
+  if (!c) return;
+  const newTitle = window.prompt("Chat ka naya naam:", c.title);
+  if (newTitle && newTitle.trim()){
+    c.title = newTitle.trim().slice(0, 60);
+    saveConversations();
+    renderHistoryList();
+  }
+}
+
+function switchConversation(id){
+  currentId = id;
+  renderChatFromCurrent();
+  renderHistoryList();
+  closeDrawer();
+}
+
+function startNewChat(){
+  const convo = newConversation();
+  conversations.push(convo);
+  currentId = convo.id;
+  saveConversations();
+  renderChatFromCurrent();
+  renderHistoryList();
+  closeDrawer();
+}
+
+function deleteConversation(id){
+  conversations = conversations.filter(c => c.id !== id);
+  if (!conversations.length){
+    conversations.push(newConversation());
+  }
+  if (id === currentId){
+    currentId = [...conversations].sort((a, b) => b.updatedAt - a.updatedAt)[0].id;
+    renderChatFromCurrent();
+  }
+  saveConversations();
+  renderHistoryList();
+}
+
+function openDrawer(){
+  drawer.classList.add("open");
+  drawerOverlay.classList.add("open");
+}
+
+function closeDrawer(){
+  drawer.classList.remove("open");
+  drawerOverlay.classList.remove("open");
+}
+
+$("menuBtn").onclick = openDrawer;
+$("closeDrawerBtn").onclick = closeDrawer;
+drawerOverlay.onclick = closeDrawer;
+$("newChatBtn").onclick = startNewChat;
+
+/* ==========================================
+   AI ROUTER
+   ========================================== */
 
 function localRouter(message){
-const t = message.toLowerCase();
-if(/code|coding|debug|javascript|python|html|css|bug|error/.test(t)) return "coding";
-if(/search|research|latest|news|source|citation|compare/.test(t)) return "research";
-if(/jee|neet|study|exam|quiz|mock|revision|flashcard/.test(t)) return "study";
-if(/plan|schedule|todo|routine|goal|reminder/.test(t)) return "planning";
-if(/image|poster|logo|design|creative|storyboard|prompt/.test(t)) return "creative";
-return "general";
+  const t = message.toLowerCase();
+  if (/code|coding|debug|javascript|python|html|css|bug|error/.test(t)) return "coding";
+  if (/search|research|latest|news|source|citation|compare/.test(t)) return "research";
+  if (/jee|neet|study|exam|quiz|mock|revision|flashcard/.test(t)) return "study";
+  if (/plan|schedule|todo|routine|goal|reminder/.test(t)) return "planning";
+  if (/image|poster|logo|design|creative|storyboard|prompt/.test(t)) return "creative";
+  return "general";
 }
 
-async function askSentra(message){
-const response = await fetch("/.netlify/functions/chat", {
-method:"POST",
-headers:{"content-type":"application/json"},
-body: JSON.stringify({
-message,
-history: history.slice(-12),
-conversationId: "main",
-userId: "default",
-modality: "text",
-permissions:{confirmImportantActions:false}
-})
-});
-const raw = await response.text();
-let data;
-try{ data = JSON.parse(raw); }
-catch{ throw new Error("Backend ne valid JSON return nahi kiya."); }
-if(!response.ok || !data.ok){ throw new Error(data.error || "Sentra request failed"); }
-return data;
+/* ==========================================
+   SENTRA BACKEND CONNECTION
+   ========================================== */
+
+async function askSentra(message, confirmed){
+  const convo = getCurrent();
+
+  const response = await fetch("/.netlify/functions/chat", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      message,
+      history: convo.messages.slice(-13, -1),
+      conversationId: convo.id,
+      userId: "default",
+      modality: "text",
+      permissions: { confirmImportantActions: !!confirmed }
+    })
+  });
+
+  const raw = await response.text();
+  let data;
+
+  try{
+    data = JSON.parse(raw);
+  } catch {
+    throw new Error("Backend ne valid JSON return nahi kiya.");
+  }
+
+  if (!response.ok || !data.ok){
+    throw new Error(data.error || "Sentra request failed");
+  }
+
+  return data;
 }
+
+/* ==========================================
+   CONFIRMATION GATE
+   Delete/send/pay/purchase jaise messages ke liye
+   pehle ek confirm-popup dikhata hai, seedha nahi bhejta.
+   ========================================== */
+
+function showConfirmPrompt(message){
+  const wrap = document.createElement("div");
+  wrap.className = "msg system";
+
+  const txt = document.createElement("div");
+  txt.style.marginBottom = "8px";
+  txt.textContent = "⚠️ Yeh message ek important action jaisa lag raha hai (delete/send/pay/purchase/etc). Bhejna confirm karo:";
+
+  const btnRow = document.createElement("div");
+  btnRow.style.display = "flex";
+  btnRow.style.gap = "8px";
+  btnRow.style.justifyContent = "center";
+  btnRow.style.flexWrap = "wrap";
+
+  const yes = document.createElement("button");
+  yes.className = "btn send";
+  yes.textContent = "✅ Confirm & Send";
+
+  const no = document.createElement("button");
+  no.className = "btn";
+  no.textContent = "❌ Cancel";
+
+  yes.onclick = async () => { wrap.remove(); await actualSend(message, true); };
+  no.onclick = () => { wrap.remove(); addMessage("Cancel kar diya.", "system"); };
+
+  btnRow.appendChild(yes);
+  btnRow.appendChild(no);
+  wrap.appendChild(txt);
+  wrap.appendChild(btnRow);
+
+  chatBox.appendChild(wrap);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+/* ==========================================
+   SEND MESSAGE
+   ========================================== */
 
 async function sendMessage(){
-const message = input.value.trim();
-if(!message) return;
-input.value = "";
-addMessage(message, "user");
-history.push({role:"user", content:message});
-saveHistory();
-const route = localRouter(message);
-try{
-const data = await askSentra(message);
-const meta = [
-data.agent ? "Agent: " + data.agent : null,
-typeof data.confidence === "number" ? "Confidence: " + Math.round(data.confidence * 100) + "%" : null,
-data.usedTools && data.usedTools.length ? "Tools: " + data.usedTools.join(", ") : null
-].filter(Boolean).join(" • ");
-addMessage(data.reply || "I don't know.", "ai", meta);
-history.push({role:"assistant", content: data.reply || ""});
-saveHistory();
+  const message = input.value.trim();
+  if (!message) return;
+  input.value = "";
+
+  if (CONFIRM_REGEX.test(message)){
+    showConfirmPrompt(message);
+    return;
+  }
+
+  await actualSend(message, false);
 }
-catch(error){
-addMessage("Connection error: " + error.message, "ai", "Detected route: " + route);
-}
+
+async function actualSend(message, confirmed){
+  addMessage(message, "user");
+
+  const convo = getCurrent();
+  convo.messages.push({ role: "user", content: message });
+  convo.updatedAt = Date.now();
+  if (convo.title === "New chat"){
+    convo.title = titleFromMessages(convo.messages);
+  }
+  saveConversations();
+  renderHistoryList();
+
+  const route = localRouter(message);
+
+  try{
+    const data = await askSentra(message, confirmed);
+
+    const meta = [
+      data.agent ? "Agent: " + data.agent : null,
+      typeof data.confidence === "number" ? "Confidence: " + Math.round(data.confidence * 100) + "%" : null,
+      data.usedTools && data.usedTools.length ? "Tools: " + data.usedTools.join(", ") : null
+    ].filter(Boolean).join(" • ");
+
+    addMessage(data.reply || "I don't know.", "ai", meta);
+
+    convo.messages.push({ role: "assistant", content: data.reply || "" });
+    convo.updatedAt = Date.now();
+    saveConversations();
+    renderHistoryList();
+
+  } catch (error){
+    addMessage("Connection error: " + error.message, "ai", "Detected route: " + route);
+  }
 }
 
 send.onclick = sendMessage;
 input.onkeydown = event => {
-if(event.key === "Enter" && !event.shiftKey){
-event.preventDefault();
-sendMessage();
-}
+  if (event.key === "Enter" && !event.shiftKey){
+    event.preventDefault();
+    sendMessage();
+  }
 };
+
+/* ==========================================
+   NAVIGATION (tool tabs)
+   ========================================== */
 
 document.querySelectorAll(".tool").forEach(button => {
-button.onclick = () => {
-document.querySelectorAll(".tool").forEach(x => x.classList.remove("active"));
-document.querySelectorAll(".panel").forEach(x => x.classList.remove("show"));
-button.classList.add("active");
-$(button.dataset.panel).classList.add("show");
-};
+  button.onclick = () => {
+    document.querySelectorAll(".tool").forEach(x => x.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(x => x.classList.remove("show"));
+    button.classList.add("active");
+    $(button.dataset.panel).classList.add("show");
+  };
 });
 
-$("clearMemory").onclick = () => {
-localStorage.removeItem("sentra_history");
-history = [];
-addMessage("Local conversation memory delete kar di gayi.", "system");
+/* ==========================================
+   QUICK NOTES (Dashboard)
+   ========================================== */
+
+function loadNotes(){ return JSON.parse(localStorage.getItem(NOTES_KEY) || "[]"); }
+function saveNotesToStorage(){ localStorage.setItem(NOTES_KEY, JSON.stringify(notes.slice(-100))); }
+
+let notes = loadNotes();
+
+function renderNotes(){
+  const box = $("notesList");
+  box.innerHTML = "";
+  if (!notes.length){
+    box.innerHTML = '<div class="historyEmpty">Koi note nahi hai.</div>';
+    return;
+  }
+  [...notes].sort((a, b) => b.createdAt - a.createdAt).forEach(n => {
+    const item = document.createElement("div");
+    item.className = "listItem";
+    const txt = document.createElement("span");
+    txt.className = "txt";
+    txt.textContent = n.text;
+    const del = document.createElement("button");
+    del.textContent = "✕";
+    del.onclick = () => {
+      notes = notes.filter(x => x.id !== n.id);
+      saveNotesToStorage();
+      renderNotes();
+    };
+    item.appendChild(txt);
+    item.appendChild(del);
+    box.appendChild(item);
+  });
+}
+
+$("saveNoteBtn").onclick = () => {
+  const val = $("noteInput").value.trim();
+  if (!val) return;
+  notes.push({ id: makeId(), text: val, createdAt: Date.now() });
+  saveNotesToStorage();
+  $("noteInput").value = "";
+  renderNotes();
 };
+
+/* ==========================================
+   REMINDERS (Dashboard)
+   ========================================== */
+
+function loadReminders(){ return JSON.parse(localStorage.getItem(REMINDERS_KEY) || "[]"); }
+function saveRemindersToStorage(){ localStorage.setItem(REMINDERS_KEY, JSON.stringify(reminders.slice(-100))); }
+
+let reminders = loadReminders();
+
+function renderReminders(){
+  const box = $("remindersList");
+  box.innerHTML = "";
+  if (!reminders.length){
+    box.innerHTML = '<div class="historyEmpty">Koi reminder nahi hai.</div>';
+    return;
+  }
+  [...reminders].sort((a, b) => b.createdAt - a.createdAt).forEach(r => {
+    const item = document.createElement("div");
+    item.className = "listItem" + (r.done ? " done" : "");
+    const txt = document.createElement("span");
+    txt.className = "txt";
+    txt.textContent = r.text;
+    txt.onclick = () => {
+      r.done = !r.done;
+      saveRemindersToStorage();
+      renderReminders();
+    };
+    const del = document.createElement("button");
+    del.textContent = "✕";
+    del.onclick = () => {
+      reminders = reminders.filter(x => x.id !== r.id);
+      saveRemindersToStorage();
+      renderReminders();
+    };
+    item.appendChild(txt);
+    item.appendChild(del);
+    box.appendChild(item);
+  });
+}
+
+$("addReminderBtn").onclick = () => {
+  const val = $("reminderInput").value.trim();
+  if (!val) return;
+  reminders.push({ id: makeId(), text: val, done: false, createdAt: Date.now() });
+  saveRemindersToStorage();
+  $("reminderInput").value = "";
+  renderReminders();
+};
+
+/* ==========================================
+   CLEAR EVERYTHING
+   ========================================== */
+
+$("clearMemory").onclick = () => {
+  localStorage.removeItem(CONVOS_KEY);
+  localStorage.removeItem(LEGACY_KEY);
+  localStorage.removeItem(NOTES_KEY);
+  localStorage.removeItem(REMINDERS_KEY);
+
+  conversations = [newConversation()];
+  currentId = conversations[0].id;
+  notes = [];
+  reminders = [];
+
+  saveConversations();
+  renderChatFromCurrent();
+  renderHistoryList();
+  renderNotes();
+  renderReminders();
+
+  addMessage("Saari local chats, notes aur reminders delete kar di gayi.", "system");
+};
+
+/* ==========================================
+   DOCUMENT INPUT
+   ========================================== */
 
 $("files").onchange = event => {
-const names = [...event.target.files].map(file => file.name).join(", ");
-if(names){ addMessage("Files selected: " + names, "system"); }
+  const names = [...event.target.files].map(file => file.name).join(", ");
+  if (names){ addMessage("Files selected: " + names, "system"); }
 };
+
+/* ==========================================
+   VOICE INPUT
+   ========================================== */
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-if(SpeechRecognition){
-const recognition = new SpeechRecognition();
-recognition.lang = "hi-IN";
-recognition.interimResults = false;
-recognition.continuous = false;
-mic.onclick = () => {
-try{ recognition.start(); mic.classList.add("listen"); }
-catch{}
-};
-recognition.onresult = event => {
-input.value = event.results[0][0].transcript;
-mic.classList.remove("listen");
-};
-recognition.onend = () => { mic.classList.remove("listen"); };
+
+if (SpeechRecognition){
+  const recognition = new SpeechRecognition();
+  recognition.lang = "hi-IN";
+  recognition.interimResults = false;
+  recognition.continuous = false;
+
+  mic.onclick = () => {
+    try{ recognition.start(); mic.classList.add("listen"); }
+    catch{}
+  };
+
+  recognition.onresult = event => {
+    input.value = event.results[0][0].transcript;
+    mic.classList.remove("listen");
+  };
+
+  recognition.onend = () => { mic.classList.remove("listen"); };
+} else {
+  mic.disabled = true;
 }
-else{ mic.disabled = true; }
 
 window.sentraSpeak = text => {
-if("speechSynthesis" in window){
-const voice = new SpeechSynthesisUtterance(text);
-voice.lang = "hi-IN";
-speechSynthesis.speak(voice);
-}
+  if ("speechSynthesis" in window){
+    const voice = new SpeechSynthesisUtterance(text);
+    voice.lang = "hi-IN";
+    speechSynthesis.speak(voice);
+  }
 };
 
+/* ==========================================
+   STARTUP
+   ========================================== */
+
+renderChatFromCurrent();
+renderHistoryList();
+renderNotes();
+renderReminders();
+
 console.log("SENTRA CORE initialized");
+console.log("Multi-chat history + Dashboard + Confirmation gate: Ready");
 </script>
+
 </body>
 </html>
