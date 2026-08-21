@@ -1,1542 +1,268 @@
+
 <!doctype html>
 <html lang="hi">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-
 <title>SENTRA — Universal AI Core</title>
-
 <style>
-:root{
-  --bg:#070a0f;
-  --panel:#10151d;
-  --panel2:#151c26;
-  --line:#27313e;
-  --text:#f4f7fb;
-  --muted:#8d99a8;
-  --accent:#38c8f2;
-  --accent2:#8b7cff;
-  --ok:#52d69a;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  background:
-  radial-gradient(circle at 50% -10%,#123244 0,#070a0f 42%);
-  color:var(--text);
-  font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;
-}
-
-button,
-input,
-textarea{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-.app{
-  max-width:900px;
-  margin:auto;
-  min-height:100vh;
-  padding:14px;
-}
-
-.top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:8px 2px 14px;
-}
-
-.logo{
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-
-.shield{
-  width:42px;
-  height:42px;
-  border:2px solid var(--accent);
-  border-radius:13px;
-  display:grid;
-  place-items:center;
-  color:var(--accent);
-  font-weight:900;
-  font-size:21px;
-  box-shadow:0 0 24px #38c8f230;
-}
-
-.brand{
-  font-size:22px;
-  font-weight:900;
-  letter-spacing:2px;
-}
-
-.sub{
-  font-size:10px;
-  color:var(--muted);
-  letter-spacing:1px;
-}
-
-.status{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  font-size:11px;
-  color:var(--ok);
-}
-
-.dot{
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  background:var(--ok);
-  box-shadow:0 0 10px var(--ok);
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:210px 1fr;
-  gap:12px;
-}
-
-.side,
-.main{
-  background:#0e131bde;
-  border:1px solid var(--line);
-  border-radius:18px;
-}
-
-.side{
-  padding:10px;
-}
-
-.tool{
-  width:100%;
-  text-align:left;
-  background:transparent;
-  color:var(--muted);
-  border:0;
-  padding:11px 12px;
-  border-radius:11px;
-  margin-bottom:3px;
-}
-
-.tool:hover,
-.tool.active{
-  background:var(--panel2);
-  color:var(--text);
-}
-
-.main{
-  overflow:hidden;
-}
-
-.chat{
-  height:60vh;
-  min-height:390px;
-  overflow:auto;
-  padding:15px;
-  display:flex;
-  flex-direction:column;
-  gap:11px;
-}
-
-.msg{
-  max-width:88%;
-  padding:12px 14px;
-  border-radius:16px;
-  line-height:1.48;
-  white-space:pre-wrap;
-}
-
-.user{
-  align-self:flex-end;
-  background:#175b76;
-}
-
-.ai{
-  align-self:flex-start;
-  background:#1b222d;
-}
-
-.system{
-  align-self:center;
-  color:var(--muted);
-  font-size:11px;
-  background:transparent;
-}
-
-.meta{
-  font-size:10px;
-  color:#7f8b99;
-  margin-top:7px;
-}
-
-.composer{
-  border-top:1px solid var(--line);
-  padding:11px;
-}
-
-.row{
-  display:flex;
-  gap:8px;
-}
-
-textarea{
-  flex:1;
-  background:#080c12;
-  color:var(--text);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:12px;
-  min-height:48px;
-  max-height:150px;
-  resize:none;
-  outline:none;
-}
-
-.btn{
-  border:1px solid var(--line);
-  background:#18212c;
-  color:var(--text);
-  border-radius:13px;
-  padding:10px 13px;
-}
-
-.send{
-  background:#08799c;
-  border-color:#1597bc;
-  font-weight:800;
-}
-
-.mic.listen{
-  background:#8d2942;
-}
-
-.controls{
-  display:flex;
-  gap:7px;
-  margin-top:8px;
-  flex-wrap:wrap;
-}
-
-.chip{
-  font-size:10px;
-  color:var(--muted);
-  padding:6px 9px;
-  border:1px solid var(--line);
-  border-radius:99px;
-}
-
-.panel{
-  display:none;
-  padding:15px;
-}
-
-.panel.show{
-  display:block;
-}
-
-.card{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:15px;
-  padding:13px;
-  margin-bottom:10px;
-}
-
-.card h3{
-  margin:0 0 7px;
-  font-size:14px;
-}
-
-.card p{
-  margin:0;
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.5;
-}
-
-@media(max-width:700px){
-
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-  .side{
-    display:flex;
-    overflow:auto;
-    gap:5px;
-  }
-
-  .tool{
-    min-width:max-content;
-    width:auto;
-  }
-
-  .chat{
-    height:58vh;
-  }
-
-}
+:root{--bg:#070a0f;--panel:#10151d;--panel2:#151c26;--line:#27313e;--text:#f4f7fb;--muted:#8d99a8;--accent:#38c8f2;--accent2:#8b7cff;--ok:#52d69a;}
+*{box-sizing:border-box;}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#123244 0,#070a0f 42%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;}
+button,input,textarea{font:inherit;}
+button{cursor:pointer;}
+.app{max-width:900px;margin:auto;min-height:100vh;padding:14px;}
+.top{display:flex;align-items:center;justify-content:space-between;padding:8px 2px 14px;}
+.logo{display:flex;gap:10px;align-items:center;}
+.shield{width:42px;height:42px;border:2px solid var(--accent);border-radius:13px;display:grid;place-items:center;color:var(--accent);font-weight:900;font-size:21px;box-shadow:0 0 24px #38c8f230;}
+.brand{font-size:22px;font-weight:900;letter-spacing:2px;}
+.sub{font-size:10px;color:var(--muted);letter-spacing:1px;}
+.status{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ok);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);}
+.grid{display:grid;grid-template-columns:210px 1fr;gap:12px;}
+.side,.main{background:#0e131bde;border:1px solid var(--line);border-radius:18px;}
+.side{padding:10px;}
+.tool{width:100%;text-align:left;background:transparent;color:var(--muted);border:0;padding:11px 12px;border-radius:11px;margin-bottom:3px;}
+.tool:hover,.tool.active{background:var(--panel2);color:var(--text);}
+.main{overflow:hidden;}
+.chat{height:60vh;min-height:390px;overflow:auto;padding:15px;display:flex;flex-direction:column;gap:11px;}
+.msg{max-width:88%;padding:12px 14px;border-radius:16px;line-height:1.48;white-space:pre-wrap;}
+.user{align-self:flex-end;background:#175b76;}
+.ai{align-self:flex-start;background:#1b222d;}
+.system{align-self:center;color:var(--muted);font-size:11px;background:transparent;}
+.meta{font-size:10px;color:#7f8b99;margin-top:7px;}
+.composer{border-top:1px solid var(--line);padding:11px;}
+.row{display:flex;gap:8px;}
+textarea{flex:1;background:#080c12;color:var(--text);border:1px solid var(--line);border-radius:14px;padding:12px;min-height:48px;max-height:150px;resize:none;outline:none;}
+.btn{border:1px solid var(--line);background:#18212c;color:var(--text);border-radius:13px;padding:10px 13px;}
+.send{background:#08799c;border-color:#1597bc;font-weight:800;}
+.mic.listen{background:#8d2942;}
+.controls{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;}
+.chip{font-size:10px;color:var(--muted);padding:6px 9px;border:1px solid var(--line);border-radius:99px;}
+.panel{display:none;padding:15px;}
+.panel.show{display:block;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:10px;}
+.card h3{margin:0 0 7px;font-size:14px;}
+.card p{margin:0;color:var(--muted);font-size:12px;line-height:1.5;}
+@media(max-width:700px){.grid{grid-template-columns:1fr;}.side{display:flex;overflow:auto;gap:5px;}.tool{min-width:max-content;width:auto;}.chat{height:58vh;}}
 </style>
 </head>
-
 <body>
-
 <div class="app">
-
 <header class="top">
-
 <div class="logo">
-
-<div class="shield">
-S
-</div>
-
+<div class="shield">S</div>
 <div>
-
-<div class="brand">
-SENTRA
+<div class="brand">SENTRA</div>
+<div class="sub">UNIVERSAL AI CORE</div>
 </div>
-
-<div class="sub">
-UNIVERSAL AI CORE
 </div>
-
-</div>
-
-</div>
-
-<div class="status">
-<span class="dot"></span>
-CORE READY
-</div>
-
+<div class="status"><span class="dot"></span>CORE READY</div>
 </header>
-
-
 <div class="grid">
-
-
-<!-- SIDE MENU -->
-
 <aside class="side">
-
-<button class="tool active" data-panel="chat">
-🧠 AI Brain
-</button>
-
-<button class="tool" data-panel="research">
-🔎 Research
-</button>
-
-<button class="tool" data-panel="coding">
-💻 Coding
-</button>
-
-<button class="tool" data-panel="study">
-📚 Study
-</button>
-
-<button class="tool" data-panel="memory">
-🧠 Memory
-</button>
-
-<button class="tool" data-panel="docs">
-📄 Documents
-</button>
-
-<button class="tool" data-panel="creative">
-🎨 Creative
-</button>
-
-<button class="tool" data-panel="assistant">
-📱 Assistant
-</button>
-
-<button class="tool" data-panel="security">
-🛡️ Security
-</button>
-
+<button class="tool active" data-panel="chat">🧠 AI Brain</button>
+<button class="tool" data-panel="research">🔎 Research</button>
+<button class="tool" data-panel="coding">💻 Coding</button>
+<button class="tool" data-panel="study">📚 Study</button>
+<button class="tool" data-panel="memory">🧠 Memory</button>
+<button class="tool" data-panel="docs">📄 Documents</button>
+<button class="tool" data-panel="creative">🎨 Creative</button>
+<button class="tool" data-panel="assistant">📱 Assistant</button>
+<button class="tool" data-panel="security">🛡️ Security</button>
 </aside>
-
-
 <main class="main">
-
-
-<!-- AI BRAIN -->
-
 <section id="chat" class="panel show">
-
 <div id="chatBox" class="chat">
-
-<div class="msg ai">
-
-Namaste! Main SENTRA hoon.
+<div class="msg ai">Namaste! Main SENTRA hoon.
 
 Reasoning • Memory • Tools • Agents • Voice • Multimodal • Safety
 
-Aap jo kaam denge, main uske liye appropriate mode/agent choose karne ki koshish karunga.
-
+Aap jo kaam denge, main uske liye appropriate mode/agent choose karne ki koshish karunga.</div>
 </div>
-
-</div>
-
-
 <div class="composer">
-
 <div class="row">
-
-<button id="mic" class="btn mic">
-🎙️
-</button>
-
-<textarea
-id="input"
-placeholder="Sentra se baat karein..."
-rows="1">
-</textarea>
-
-<button id="send" class="btn send">
-Send
-</button>
-
+<button id="mic" class="btn mic">🎙️</button>
+<textarea id="input" placeholder="Sentra se baat karein..." rows="1"></textarea>
+<button id="send" class="btn send">Send</button>
 </div>
-
-
 <div class="controls">
-
-<span class="chip">
-Fast / Powerful routing
-</span>
-
-<span class="chip">
-Self-check
-</span>
-
-<span class="chip">
-Context
-</span>
-
-<span class="chip">
-Permission-first
-</span>
-
+<span class="chip">Fast / Powerful routing</span>
+<span class="chip">Self-check</span>
+<span class="chip">Context</span>
+<span class="chip">Permission-first</span>
 </div>
-
 </div>
-
 </section>
-
-
-<!-- RESEARCH -->
-
 <section id="research" class="panel">
-
-<div class="card">
-
-<h3>
-🔎 Research Agent
-</h3>
-
-<p>
-
-Live web search, multiple-source comparison,
-citations, latest data, deep research aur
-conflict detection backend/tool integration
-ke through.
-
-</p>
-
-</div>
-
-
-<div class="card">
-
-<h3>
-Source honesty
-</h3>
-
-<p>
-
-Jab search provider connected nahi hoga,
-Sentra source hone ka jhootha claim nahi karega.
-
-</p>
-
-</div>
-
+<div class="card"><h3>🔎 Research Agent</h3><p>Live web search, multiple-source comparison, citations, latest data, deep research aur conflict detection backend/tool integration ke through.</p></div>
+<div class="card"><h3>Source honesty</h3><p>Jab search provider connected nahi hoga, Sentra source hone ka jhootha claim nahi karega.</p></div>
 </section>
-
-
-<!-- CODING -->
-
 <section id="coding" class="panel">
-
-<div class="card">
-
-<h3>
-💻 Coding Agent
-</h3>
-
-<p>
-
-Code generation, explanation, debugging,
-project context, tests aur app/website
-development ke liye dedicated agent route.
-
-</p>
-
-</div>
-
-
-<div class="card">
-
-<h3>
-Project-aware workflow
-</h3>
-
-<p>
-
-GitHub/files integration backend tools ke
-through connect ki ja sakti hai.
-
-API keys browser mein nahi rakhi jaani chahiye.
-
-</p>
-
-</div>
-
+<div class="card"><h3>💻 Coding Agent</h3><p>Code generation, explanation, debugging, project context, tests aur app/website development ke liye dedicated agent route.</p></div>
+<div class="card"><h3>Project-aware workflow</h3><p>GitHub/files integration backend tools ke through connect ki ja sakti hai. API keys browser mein nahi rakhi jaani chahiye.</p></div>
 </section>
-
-
-<!-- STUDY -->
-
 <section id="study" class="panel">
-
-<div class="card">
-
-<h3>
-📚 Study Super Brain
-</h3>
-
-<p>
-
-Teacher mode, doubt solving, JEE/NEET
-preparation, personalized planning,
-quizzes, mock tests, mistakes,
-revision aur flashcards ke liye study agent.
-
-</p>
-
-</div>
-
+<div class="card"><h3>📚 Study Super Brain</h3><p>Teacher mode, doubt solving, JEE/NEET preparation, personalized planning, quizzes, mock tests, mistakes, revision aur flashcards ke liye study agent.</p></div>
 </section>
-
-
-<!-- MEMORY -->
-
 <section id="memory" class="panel">
-
-<div class="card">
-
-<h3>
-🧠 User-controlled Memory
-</h3>
-
-<p>
-
-Preferences, projects, goals, notes aur
-conversation summaries ko permission ke
-saath store karne ka interface.
-
-</p>
-
-</div>
-
-<button id="clearMemory" class="btn">
-
-Delete local memory
-
-</button>
-
+<div class="card"><h3>🧠 User-controlled Memory</h3><p>Preferences, projects, goals, notes aur conversation summaries ko permission ke saath store karne ka interface.</p></div>
+<button id="clearMemory" class="btn">Delete local memory</button>
 </section>
-
-
-<!-- DOCUMENTS -->
-
 <section id="docs" class="panel">
-
-<div class="card">
-
-<h3>
-📄 Document Intelligence
-</h3>
-
-<p>
-
-PDF, image, Word, spreadsheet, extraction,
-summarization aur document comparison ke
-liye multimodal attachment contract.
-
-</p>
-
-</div>
-
-<input
-id="files"
-type="file"
-multiple
-class="btn">
-
+<div class="card"><h3>📄 Document Intelligence</h3><p>PDF, image, Word, spreadsheet, extraction, summarization aur document comparison ke liye multimodal attachment contract.</p></div>
+<input id="files" type="file" multiple class="btn">
 </section>
-
-
-<!-- CREATIVE -->
-
 <section id="creative" class="panel">
-
-<div class="card">
-
-<h3>
-🎨 Creative Studio
-</h3>
-
-<p>
-
-Image generation/editing, poster, logo,
-presentation, social content,
-storyboarding aur prompt generation
-ko tool connectors ke through invoke
-kiya ja sakta hai.
-
-</p>
-
-</div>
-
+<div class="card"><h3>🎨 Creative Studio</h3><p>Image generation/editing, poster, logo, presentation, social content, storyboarding aur prompt generation ko tool connectors ke through invoke kiya ja sakta hai.</p></div>
 </section>
-
-
-<!-- PERSONAL ASSISTANT -->
-
 <section id="assistant" class="panel">
-
-<div class="card">
-
-<h3>
-📱 Personal Assistant
-</h3>
-
-<p>
-
-Reminders, calendar, tasks, notes,
-planning aur notifications ke liye
-permission-based external integrations.
-
-</p>
-
-</div>
-
-
-<div class="card">
-
-<h3>
-Important actions
-</h3>
-
-<p>
-
-Send, publish, delete, purchase,
-booking ya external action se pehle
-confirmation gate use hona chahiye.
-
-</p>
-
-</div>
-
+<div class="card"><h3>📱 Personal Assistant</h3><p>Reminders, calendar, tasks, notes, planning aur notifications ke liye permission-based external integrations.</p></div>
+<div class="card"><h3>Important actions</h3><p>Send, publish, delete, purchase, booking ya external action se pehle confirmation gate use hona chahiye.</p></div>
 </section>
-
-
-<!-- SECURITY -->
-
 <section id="security" class="panel">
-
-<div class="card">
-
-<h3>
-🛡️ SENTRA CORE
-</h3>
-
-<p>
-
-API keys frontend mein nahi.
-
-Sensitive data encryption,
-permissions, memory controls,
-delete-all-data, privacy dashboard
-aur confirmation-first design.
-
-</p>
-
-</div>
-
-
-<div class="card">
-
-<h3>
-Never act without permission
-</h3>
-
-<p>
-
-External actions ke liye user confirmation
-required rakho.
-
-Browser UI sirf request bheje.
-
-Secrets backend environment variables
-mein rahen.
-
-</p>
-
-</div>
-
+<div class="card"><h3>🛡️ SENTRA CORE</h3><p>API keys frontend mein nahi. Sensitive data encryption, permissions, memory controls, delete-all-data, privacy dashboard aur confirmation-first design.</p></div>
+<div class="card"><h3>Never act without permission</h3><p>External actions ke liye user confirmation required rakho. Browser UI sirf request bheje. Secrets backend environment variables mein rahen.</p></div>
 </section>
-
-
 </main>
-
 </div>
-
 </div>
-
-
 <script>
-
-/*
-====================================================
-SENTRA UNIVERSAL CORE
-====================================================
-
-Features represented:
-
-1. AI Brain
-2. Research
-3. Coding
-4. Computer/Agent architecture
-5. Voice
-6. Memory
-7. Personal Assistant
-8. Study Super Brain
-9. Documents
-10. Creative Studio
-11. Communication
-12. Tool System
-13. Multi-Agent
-14. Security
-15. Personal Knowledge
-16. Multimodal
-17. Speed routing
-18. Controlled improvement
-19. SENTRA CORE
-
-IMPORTANT:
-
-AI API KEY ko kabhi bhi is HTML file mein
-mat rakhna.
-
-AI requests secure backend se jayengi.
-
-====================================================
-*/
-
-
 const $ = id => document.getElementById(id);
-
 const chatBox = $("chatBox");
-
 const input = $("input");
-
 const send = $("send");
-
 const mic = $("mic");
+let history = JSON.parse(localStorage.getItem("sentra_history") || "[]");
 
-
-let history =
-JSON.parse(
-localStorage.getItem("sentra_history") || "[]"
-);
-
-
-/*
-====================================================
-MESSAGE UI
-====================================================
-*/
-
-function addMessage(
-text,
-type="ai",
-meta=""
-){
-
-const el =
-document.createElement("div");
-
-el.className =
-"msg " + type;
-
-el.textContent =
-text;
-
-
+function addMessage(text,type="ai",meta=""){
+const el = document.createElement("div");
+el.className = "msg " + type;
+el.textContent = text;
 if(meta){
-
-const m =
-document.createElement("div");
-
-m.className =
-"meta";
-
-m.textContent =
-meta;
-
+const m = document.createElement("div");
+m.className = "meta";
+m.textContent = meta;
 el.appendChild(m);
-
 }
-
-
 chatBox.appendChild(el);
-
-chatBox.scrollTop =
-chatBox.scrollHeight;
-
+chatBox.scrollTop = chatBox.scrollHeight;
 }
-
-
-/*
-====================================================
-LOCAL MEMORY
-====================================================
-*/
 
 function saveHistory(){
-
-localStorage.setItem(
-"sentra_history",
-JSON.stringify(
-history.slice(-30)
-)
-);
-
+localStorage.setItem("sentra_history", JSON.stringify(history.slice(-100)));
 }
-
-
-/*
-====================================================
-AI ROUTER
-====================================================
-*/
 
 function localRouter(message){
-
-const t =
-message.toLowerCase();
-
-
-if(
-/code|coding|debug|javascript|python|html|css|bug|error/.test(t)
-)
-
-return "coding";
-
-
-if(
-/search|research|latest|news|source|citation|compare/.test(t)
-)
-
-return "research";
-
-
-if(
-/jee|neet|study|exam|quiz|mock|revision|flashcard/.test(t)
-)
-
-return "study";
-
-
-if(
-/plan|schedule|todo|routine|goal|reminder/.test(t)
-)
-
-return "planning";
-
-
-if(
-/image|poster|logo|design|creative|storyboard|prompt/.test(t)
-)
-
-return "creative";
-
-
+const t = message.toLowerCase();
+if(/code|coding|debug|javascript|python|html|css|bug|error/.test(t)) return "coding";
+if(/search|research|latest|news|source|citation|compare/.test(t)) return "research";
+if(/jee|neet|study|exam|quiz|mock|revision|flashcard/.test(t)) return "study";
+if(/plan|schedule|todo|routine|goal|reminder/.test(t)) return "planning";
+if(/image|poster|logo|design|creative|storyboard|prompt/.test(t)) return "creative";
 return "general";
-
 }
-
-
-/*
-====================================================
-SENTRA BACKEND CONNECTION
-====================================================
-*/
 
 async function askSentra(message){
-
-const response =
-await fetch(
-"/.netlify/functions/sentra",
-{
-
+const response = await fetch("/.netlify/functions/chat", {
 method:"POST",
-
-headers:{
-"content-type":
-"application/json"
-},
-
-body:
-JSON.stringify({
-
+headers:{"content-type":"application/json"},
+body: JSON.stringify({
 message,
-
-history:
-history.slice(-12),
-
-conversationId:
-"main",
-
-userId:
-"default",
-
-modality:
-"text",
-
-permissions:{
-confirmImportantActions:
-false
-}
-
+history: history.slice(-12),
+conversationId: "main",
+userId: "default",
+modality: "text",
+permissions:{confirmImportantActions:false}
 })
-
-}
-);
-
-
-const raw =
-await response.text();
-
-
+});
+const raw = await response.text();
 let data;
-
-
-try{
-
-data =
-JSON.parse(raw);
-
-}
-
-catch{
-
-throw new Error(
-"Backend ne valid JSON return nahi kiya."
-);
-
-}
-
-
-if(
-!response.ok ||
-!data.ok
-){
-
-throw new Error(
-data.error ||
-"Sentra request failed"
-);
-
-}
-
-
+try{ data = JSON.parse(raw); }
+catch{ throw new Error("Backend ne valid JSON return nahi kiya."); }
+if(!response.ok || !data.ok){ throw new Error(data.error || "Sentra request failed"); }
 return data;
-
 }
-
-
-/*
-====================================================
-SEND MESSAGE
-====================================================
-*/
 
 async function sendMessage(){
-
-const message =
-input.value.trim();
-
-
-if(!message)
-return;
-
-
+const message = input.value.trim();
+if(!message) return;
 input.value = "";
-
-
-addMessage(
-message,
-"user"
-);
-
-
-history.push({
-
-role:"user",
-
-content:message
-
-});
-
-
+addMessage(message, "user");
+history.push({role:"user", content:message});
 saveHistory();
-
-
-const route =
-localRouter(message);
-
-
+const route = localRouter(message);
 try{
-
-
-const data =
-await askSentra(message);
-
-
+const data = await askSentra(message);
 const meta = [
-
-data.agent
-?
-"Agent: " + data.agent
-:
-null,
-
-typeof data.confidence === "number"
-?
-"Confidence: " +
-Math.round(
-data.confidence * 100
-) + "%"
-:
-null,
-
-data.usedTools &&
-data.usedTools.length
-?
-"Tools: " +
-data.usedTools.join(", ")
-:
-null
-
-]
-.filter(Boolean)
-.join(" • ");
-
-
-addMessage(
-
-data.reply ||
-"I don't know.",
-
-"ai",
-
-meta
-
-);
-
-
-history.push({
-
-role:"assistant",
-
-content:
-data.reply || ""
-
-});
-
-
+data.agent ? "Agent: " + data.agent : null,
+typeof data.confidence === "number" ? "Confidence: " + Math.round(data.confidence * 100) + "%" : null,
+data.usedTools && data.usedTools.length ? "Tools: " + data.usedTools.join(", ") : null
+].filter(Boolean).join(" • ");
+addMessage(data.reply || "I don't know.", "ai", meta);
+history.push({role:"assistant", content: data.reply || ""});
 saveHistory();
-
-
 }
-
 catch(error){
-
-
-addMessage(
-
-"Connection error: " +
-error.message,
-
-"ai",
-
-"Detected route: " +
-route
-
-);
-
-
+addMessage("Connection error: " + error.message, "ai", "Detected route: " + route);
+}
 }
 
-}
-
-
-/*
-====================================================
-SEND EVENTS
-====================================================
-*/
-
-send.onclick =
-sendMessage;
-
-
-input.onkeydown =
-event => {
-
-if(
-event.key === "Enter" &&
-!event.shiftKey
-){
-
+send.onclick = sendMessage;
+input.onkeydown = event => {
+if(event.key === "Enter" && !event.shiftKey){
 event.preventDefault();
-
 sendMessage();
-
 }
-
 };
 
-
-/*
-====================================================
-NAVIGATION
-====================================================
-*/
-
-document
-.querySelectorAll(".tool")
-.forEach(button => {
-
-
+document.querySelectorAll(".tool").forEach(button => {
 button.onclick = () => {
-
-
-document
-.querySelectorAll(".tool")
-.forEach(
-x =>
-x.classList.remove(
-"active"
-)
-);
-
-
-document
-.querySelectorAll(".panel")
-.forEach(
-x =>
-x.classList.remove(
-"show"
-)
-);
-
-
-button.classList.add(
-"active"
-);
-
-
-$(
-button.dataset.panel
-)
-.classList.add(
-"show"
-);
-
-
+document.querySelectorAll(".tool").forEach(x => x.classList.remove("active"));
+document.querySelectorAll(".panel").forEach(x => x.classList.remove("show"));
+button.classList.add("active");
+$(button.dataset.panel).classList.add("show");
 };
-
 });
-
-
-/*
-====================================================
-MEMORY DELETE
-====================================================
-*/
 
 $("clearMemory").onclick = () => {
-
-localStorage.removeItem(
-"sentra_history"
-);
-
+localStorage.removeItem("sentra_history");
 history = [];
-
-
-addMessage(
-
-"Local conversation memory delete kar di gayi.",
-
-"system"
-
-);
-
+addMessage("Local conversation memory delete kar di gayi.", "system");
 };
 
-
-/*
-====================================================
-DOCUMENT INPUT
-====================================================
-*/
-
-$("files").onchange =
-event => {
-
-const names =
-[
-...event.target.files
-]
-.map(
-file =>
-file.name
-)
-.join(", ");
-
-
-if(names){
-
-addMessage(
-
-"Files selected: " +
-names,
-
-"system"
-
-);
-
-}
-
+$("files").onchange = event => {
+const names = [...event.target.files].map(file => file.name).join(", ");
+if(names){ addMessage("Files selected: " + names, "system"); }
 };
 
-
-/*
-====================================================
-VOICE INPUT
-====================================================
-*/
-
-const SpeechRecognition =
-window.SpeechRecognition ||
-window.webkitSpeechRecognition;
-
-
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 if(SpeechRecognition){
-
-const recognition =
-new SpeechRecognition();
-
-
-recognition.lang =
-"hi-IN";
-
-
-recognition.interimResults =
-false;
-
-
-recognition.continuous =
-false;
-
-
+const recognition = new SpeechRecognition();
+recognition.lang = "hi-IN";
+recognition.interimResults = false;
+recognition.continuous = false;
 mic.onclick = () => {
-
-try{
-
-recognition.start();
-
-mic.classList.add(
-"listen"
-);
-
-}
-
+try{ recognition.start(); mic.classList.add("listen"); }
 catch{}
+};
+recognition.onresult = event => {
+input.value = event.results[0][0].transcript;
+mic.classList.remove("listen");
+};
+recognition.onend = () => { mic.classList.remove("listen"); };
+}
+else{ mic.disabled = true; }
 
+window.sentraSpeak = text => {
+if("speechSynthesis" in window){
+const voice = new SpeechSynthesisUtterance(text);
+voice.lang = "hi-IN";
+speechSynthesis.speak(voice);
+}
 };
 
-
-recognition.onresult =
-event => {
-
-input.value =
-event.results[0][0]
-.transcript;
-
-mic.classList.remove(
-"listen"
-);
-
-};
-
-
-recognition.onend =
-() => {
-
-mic.classList.remove(
-"listen"
-);
-
-};
-
-
-}
-
-else{
-
-mic.disabled =
-true;
-
-}
-
-
-/*
-====================================================
-TEXT TO SPEECH
-====================================================
-*/
-
-window.sentraSpeak =
-text => {
-
-
-if(
-"speechSynthesis"
-in window
-){
-
-const voice =
-new SpeechSynthesisUtterance(
-text
-);
-
-
-voice.lang =
-"hi-IN";
-
-
-speechSynthesis.speak(
-voice
-);
-
-}
-
-};
-
-
-/*
-====================================================
-SENTRA TOOL INTENT
-====================================================
-*/
-
-function detectTool(message){
-
-const text =
-message.toLowerCase();
-
-
-if(
-/calculate|calculator|plus|minus|multiply|divide/.test(text)
-)
-
-return "calculator";
-
-
-if(
-/weather|temperature|mausam/.test(text)
-)
-
-return "weather";
-
-
-if(
-/map|location|direction|route/.test(text)
-)
-
-return "maps";
-
-
-if(
-/calendar|meeting|appointment/.test(text)
-)
-
-return "calendar";
-
-
-if(
-/note|save this|remember this/.test(text)
-)
-
-return "notes";
-
-
-if(
-/search|latest|news|research/.test(text)
-)
-
-return "web";
-
-
-return "none";
-
-}
-
-
-/*
-====================================================
-COMPLEXITY DETECTION
-====================================================
-*/
-
-function chooseModel(message){
-
-if(
-message.length > 1200
-)
-
-return "powerful";
-
-
-if(
-/deep|complex|analyze|reason|architecture|debug|research/i
-.test(message)
-)
-
-return "powerful";
-
-
-return "fast";
-
-}
-
-
-/*
-====================================================
-CONFIRMATION GATE
-====================================================
-*/
-
-function needsConfirmation(message){
-
-return
-/delete|remove|erase|send|publish|post|submit|pay|purchase|buy|transfer|book/i
-.test(message);
-
-}
-
-
-/*
-====================================================
-MULTI AGENT ROUTER
-====================================================
-*/
-
-function chooseAgent(message){
-
-const route =
-localRouter(message);
-
-
-const agents = {
-
-research:
-"Research Agent",
-
-coding:
-"Coding Agent",
-
-study:
-"Study Agent",
-
-planning:
-"Planning Agent",
-
-creative:
-"Creative Agent",
-
-general:
-"General Agent"
-
-};
-
-
-return agents[route];
-
-}
-
-
-/*
-====================================================
-STARTUP
-====================================================
-*/
-
-console.log(
-"SENTRA CORE initialized"
-);
-
-console.log(
-"AI Router: Ready"
-);
-
-console.log(
-"Multi-Agent System: Ready"
-);
-
-console.log(
-"Memory System: Ready"
-);
-
-console.log(
-"Voice System: Ready"
-);
-
-console.log(
-"Security Gate: Ready"
-);
-
+console.log("SENTRA CORE initialized");
 </script>
-
 </body>
-  </html>
+</html>
